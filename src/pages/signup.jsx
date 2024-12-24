@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "../supabase";
+import { toast } from "react-toastify";
 
 export const Signup = () => {
     const [email, setEmail] = useState("");
@@ -17,10 +18,12 @@ export const Signup = () => {
                 email,
                 password,
             });
-            if (error) throw error;
-            alert("Signup successful! Please check your email to verify your account.");
+            if (error) throw error;            
+            toast("success", "Signup successful! Please check your email to verify your account.")
+            
         } catch (error) {
-            setError(error.message);
+            setError("");
+            toast("error", error.message)
         } finally {
             setLoading(false);
         }
@@ -36,7 +39,8 @@ export const Signup = () => {
             });
             if (error) throw error;
         } catch (error) {
-            setError(error.message);
+            setError("");
+            toast("error", error.message)
         } finally {
             setLoading(false);
         }

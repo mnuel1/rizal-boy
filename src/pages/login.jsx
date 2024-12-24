@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { supabase } from "../supabase"
-
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 export const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate()
       
     const handleLogin = async (e) => {
       e.preventDefault();
@@ -18,9 +21,11 @@ export const Login = () => {
           password,
         });
         if (error) throw error;
-        alert("Login successful!");
+        toast("success", "Login Successfull")
+        navigate("/login")
       } catch (error) {
-        setError(error.message);
+        setError("");
+        toast("error", error.message)
       } finally {
         setLoading(false);
       }
@@ -36,9 +41,11 @@ export const Login = () => {
         });
         if (error) throw error;        
       } catch (error) {
-        setError(error.message);
+        setError("");
+        toast("error", error.message)
       } finally {
         setLoading(false);
+        toast("success", "Login Successfull")
       }
     };
   
