@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "../supabase"
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Authentication } from "../Authentication/auth";
 export const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    const { login } = Authentication()
 
     const navigate = useNavigate()
       
@@ -16,12 +19,16 @@ export const Login = () => {
       setError(null);
   
       try {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
+
+        
+        login(data.user.user_metadata?.full_name || "", data.user.user.id, email)
         toast("success", "Login Successfull")
+        
         navigate("/login")
       } catch (error) {
         setError("");
@@ -31,6 +38,23 @@ export const Login = () => {
       }
     };
   
+    useEffect(() => {
+      // Subscribe to authentication state changes
+      const authListener = supabase.auth.onAuthStateChange((event, session) => {
+        if (session?.user) {          
+          console.log("User ID:", session.user.id);
+          console.log("User Name:", session.user.user_metadata?.full_name || "No name found");
+          console.log("User Name:", session.user.user_metadata?.email || "");
+        }
+      });
+  
+      // No need to manually unsubscribe, Supabase handles cleanup when component unmounts
+      return () => {
+        // Simply rely on React cleanup (no need to unsubscribe)
+        // authListener?.unsubscribe();
+      };
+    }, []);
+  
     const handleGoogleLogin = async () => {
       setLoading(true);
       setError(null);
@@ -39,13 +63,13 @@ export const Login = () => {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
         });
-        if (error) throw error;        
+  
+        if (error) throw error;
       } catch (error) {
-        setError("");
-        toast("error", error.message)
+        setError(error.message);
+        console.log("Login error:", error.message);
       } finally {
         setLoading(false);
-        toast("success", "Login Successfull")
       }
     };
   

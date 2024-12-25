@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 
+
 export const Nav = () => {
+    // State to toggle mobile menu
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    // Toggle mobile menu visibility
+    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
     return (
-        <div className="absolute flex justify-between max-w-7xl sticky top-10 z-50 m-auto px-6">
+        <div className="relative flex justify-between max-w-7xl sticky top-10 z-50 m-auto px-6">
+            
             <div className="w-[40px] h-[40px] rounded-full bg-[#C9E6F0] p-1">
                 <img
                     src="https://pluspng.com/img-png/rizal-png-jose-rizal-is-my-homeboy-women-s-tee-178.png"
@@ -11,30 +19,52 @@ export const Nav = () => {
                 />
             </div>
 
-            <div className="flex items-center gap-4">
+            
+            <div className="hidden md:flex items-center gap-4">
                 <a href="#hero"><span className="cursor-pointer hover:text-[#89d9f2]">Home</span></a>
                 <a href="#about"><span className="cursor-pointer hover:text-[#89d9f2]">Samples</span></a>
                 <a href="#faq"><span className="cursor-pointer hover:text-[#89d9f2]">FAQs</span></a>
                 |
                 <div className="ml-2 flex gap-4">
                     <a href="/login">
-                        <span className="cursor-pointer rounded-xl bg-[#89d9f2] 
-                            hover:bg-[#6bbbd4] px-4 p-2 text-black">
-                                Login
+                        <span className="cursor-pointer rounded-xl bg-[#89d9f2] hover:bg-[#6bbbd4] px-4 p-2 text-black">
+                            Login
                         </span>
                     </a>
-                    
                     <a href="/signup">
-                        <span className="cursor-pointer border rounded-xl border-[#89d9f2] 
-                            hover:bg-[#6bbbd4] px-4 p-2 text-white hover:text-black">
-                                Signup
+                        <span className="cursor-pointer border rounded-xl border-[#89d9f2] hover:bg-[#6bbbd4] px-4 p-2 text-white hover:text-black">
+                            Signup
                         </span>
                     </a>
                 </div>
             </div>
+
+            
+            <div className="md:hidden flex items-center z-50">
+                <button onClick={toggleMenu} className="text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-8 h-8">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+
+            
+            {isMenuOpen && (
+                <div className="absolute top-0 right-0 bg-[#1a202c] w-full h-screen flex flex-col items-center py-8 space-y-6 text-white">
+                    <a href="#hero" className="hover:text-[#89d9f2]" onClick={toggleMenu}>Home</a>
+                    <a href="#about" className="hover:text-[#89d9f2]" onClick={toggleMenu}>Samples</a>
+                    <a href="#faq" className="hover:text-[#89d9f2]" onClick={toggleMenu}>FAQs</a>
+                    __________
+                    <div className="mt-4 flex flex-col items-center gap-4">
+                        <a href="/login" className="cursor-pointer rounded-xl bg-[#89d9f2] hover:bg-[#6bbbd4] px-4 p-2 text-black" onClick={toggleMenu}>Login</a>
+                        <a href="/signup" className="cursor-pointer border rounded-xl border-[#89d9f2] hover:bg-[#6bbbd4] px-4 p-2 text-white hover:text-black" onClick={toggleMenu}>Signup</a>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
+
 
 export const Hero = () => {
 
