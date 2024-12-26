@@ -1,13 +1,51 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { generateContent } from '../service/ai';
 import { Toast } from './toast';
+import { supabase } from '../supabase';
+import { Authentication } from '../Authentication/auth';
 
 export const ChatInput = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
+  const { id } = useParams()
+  const { getID } = Authentication()
 
+  const newChat = async () => {
+    const userID = getID()
+    const { data, error } = await supabase
+    .from('chat_room')
+    .insert([{ user_id: userID, title: "Conversation" }])
+    .select();
+
+    if (error) {
+      console.error("Error inserting chat room:", error.message);
+      Toast("error", "Something went wrong!");
+      return null;
+    }   
+    return data[0].id    
+  }
+
+  const newMessage = async (id, message, response) => {
+    const { error } = await supabase
+    .from('room_messages')
+    .insert([{ room_id: id, message: message, response: response }])    
+
+    if (error) {
+      console.error("Error inserting chat room:", error.message);
+      Toast("error", "Something went wrong!");
+    }
+
+  }
   const handleSend = async () => {
+
+    let insertedId = id;
+    
+    if (!id) {
+      insertedId = await newChat()
+    }
+    
     setLoading(true);
     const response = await generateContent(input);
 
@@ -17,6 +55,13 @@ export const ChatInput = () => {
       return;
     }
 
+    if (insertedId) {
+      newMessage(
+        insertedId, 
+        input, 
+        response.data.candidates[0].content.parts[0].text
+      )
+    }
     console.log(response.data.candidates[0].content.parts[0].text);
     setInput("");
     setLoading(false);
@@ -27,7 +72,7 @@ export const ChatInput = () => {
       Toast("error", "Your browser does not support voice input.");
       return;
     }
-
+        
     const recognition = new window.webkitSpeechRecognition();
     recognition.lang = 'en-US';
     recognition.interimResults = false;
@@ -49,7 +94,7 @@ export const ChatInput = () => {
 
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
-      setInput((prevInput) => `${prevInput} ${transcript}`);
+      setInput((prevInput) => `${prevInput} ${transcript}`);      
     };
 
     recognition.start();
@@ -86,10 +131,11 @@ export const ChatInput = () => {
                 />
               </svg>
             </button>
-          ) : (
+          ) : (            
             <button 
             onClick={handleMic}
-            className="p-2 bg-[#89D9F2] text-white rounded-full hover:bg-[#6bbbd4]">            
+            className={`p-2 bg-[#89D9F2] text-white rounded-full 
+            hover:bg-[#6bbbd4] ${listening ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

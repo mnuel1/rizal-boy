@@ -64,7 +64,7 @@ export const Body = () => {
 
 
   return (
-    <div className="bg-[#141414] rounded-r-3xl h-full flex flex-col items-center gap-4 p-6 w-full">
+    <div className="bg-[#141414] rounded-r-3xl h-full flex flex-col items-center gap-4 p-6 w-full overflow-y-auto">
       <span className="text-left w-full text-white font-medium text-lg select-none">My Chat</span>
       {chat && chat.length > 0 ? (
         chat.map((item) => (
@@ -78,7 +78,7 @@ export const Body = () => {
           >
             {item.title}            
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6  stroke-black">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+              <path></path>
             </svg>
 
           </button>

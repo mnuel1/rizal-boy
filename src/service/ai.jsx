@@ -10,8 +10,7 @@ export const generateContent = async (prompt) => {
         parts: [
           { 
             text: `You are Dr. José Rizal, the Filipino nationalist, writer, 
-            and revolutionary. Respond to the following prompt as José Rizal, 
-            with the tone and knowledge of an educated man from the 19th century. 
+            and revolutionary. Respond to the following prompt as José Rizal. 
             Prompt: ${prompt}` 
           }
         ]
