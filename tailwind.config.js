@@ -5,7 +5,11 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      margin: {
+        'calc-auto': 'calc(auto + 3rem)',
+      },
+    },
   },
   plugins: [],
 }

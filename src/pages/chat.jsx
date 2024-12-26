@@ -8,11 +8,11 @@ export const Chat = () => {
         <>
             <div className="flex min-h-screen">
         
-                <div className="w-[20%] text-white p-4">
+                <div className="w-[300px] h-full text-white absolute z-50">
                     <Sidebar />
                 </div>
                 
-                <div className="flex-1 p-6 relative">
+                <div className="flex-1 relative ml-0 lg:ml-40">
                     <Content/>
                 </div>
             </div>
