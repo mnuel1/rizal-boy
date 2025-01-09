@@ -4,19 +4,20 @@ import { generateContent } from '../service/ai';
 import { Toast } from './toast';
 import { supabase } from '../supabase';
 import { Authentication } from '../Authentication/auth';
-
+import { useNavigate } from 'react-router-dom';
 export const ChatInput = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
   const { id } = useParams()
   const { getID } = Authentication()
+  const navigate = useNavigate()
 
-  const newChat = async () => {
+  const newChat = async (title) => {
     const userID = getID()
     const { data, error } = await supabase
     .from('chat_room')
-    .insert([{ user_id: userID, title: "Conversation" }])
+    .insert([{ user_id: userID, title: title }])
     .select();
 
     if (error) {
@@ -27,10 +28,10 @@ export const ChatInput = () => {
     return data[0].id    
   }
 
-  const newMessage = async (id, message, response) => {
+  const newMessage = async (id, message, response, type) => {
     const { error } = await supabase
     .from('room_messages')
-    .insert([{ room_id: id, message: message, response: response }])    
+    .insert([{ room_id: id, message: message, response: response, type: type }])    
 
     if (error) {
       console.error("Error inserting chat room:", error.message);
@@ -38,14 +39,23 @@ export const ChatInput = () => {
     }
 
   }
-  const handleSend = async () => {
 
-    let insertedId = id;
-    
-    if (!id) {
-      insertedId = await newChat()
+  const extractJSON = (response) => {  
+    const jsonMatch = response.match(/```json([\s\S]*?)```/);
+    if (jsonMatch && jsonMatch[1]) {
+        try {            
+            return JSON.parse(jsonMatch[1].trim());
+        } catch (error) {
+            console.error("Error parsing JSON:", error);
+            return null;
+        }
+    } else {
+        console.error("No JSON block found in the response.");
+        return null;
     }
-    
+}
+  const handleSend = async () => {
+      
     setLoading(true);
     const response = await generateContent(input);
 
@@ -54,17 +64,41 @@ export const ChatInput = () => {
       setLoading(false);
       return;
     }
+    const res = response.data.candidates[0].content.parts[0].text; // ai response
+
+    const parsedData = extractJSON(res)
+
+    if (!parsedData) {
+      Toast("error", "Something went wrong!");
+      setLoading(false);
+      return
+    }    
+    let insertedId = id;
+    const redirect = id ? true : false
+    if (!id) {
+      insertedId = await newChat(parsedData.title)
+    }
 
     if (insertedId) {
+      const type = parsedData.type
+      const text = type === "question" ? parsedData.response : parsedData.questions
+
       newMessage(
         insertedId, 
         input, 
-        response.data.candidates[0].content.parts[0].text
+        text,
+        type
       )
+     
     }
-    console.log(response.data.candidates[0].content.parts[0].text);
+    // console.log(response.data.candidates[0].content.parts[0].text);
     setInput("");
+    
     setLoading(false);
+
+    if (!redirect) {          
+      navigate(`/chat/${insertedId}`)
+    }
   };
 
   const handleMic = async () => {
@@ -109,6 +143,11 @@ export const ChatInput = () => {
           className="flex-1 p-2 outline-none bg-[#222729] text-white"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && input !== "") {
+              handleSend()
+            }
+          }}
         />
 
         {!loading ? (
