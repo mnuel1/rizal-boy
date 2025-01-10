@@ -92,13 +92,13 @@ export const ChatInput = () => {
      
     }
     // console.log(response.data.candidates[0].content.parts[0].text);
-    setInput("");
-    
+    setInput("");    
     setLoading(false);
 
     if (!redirect) {          
       navigate(`/chat/${insertedId}`)
     }
+    window.location.reload();
   };
 
   const handleMic = async () => {

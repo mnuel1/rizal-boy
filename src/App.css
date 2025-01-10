@@ -4,6 +4,11 @@
   }
   
 .backface-hidden {
-    backface-visibility: hidden;
+    backface-visibility: hidden
 }
+
+.backface-show {
+  backface-visibility: visible;
+}
+
   
